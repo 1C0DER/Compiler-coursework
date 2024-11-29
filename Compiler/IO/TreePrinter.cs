@@ -171,7 +171,7 @@ namespace Compiler.IO
             {
                 // Program
                 case ProgramNode programNode:
-                    return NodeToString(lastChild, programNode, programNode.Command);
+                    return NodeToString(lastChild, programNode, programNode.Command, programNode.Declaration);
 
                 // Commands
                 case AssignCommandNode assignCommand:

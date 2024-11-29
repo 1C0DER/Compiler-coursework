@@ -90,7 +90,7 @@ namespace Compiler.SyntacticAnalysis
             IDeclarationNode declaration = ParseDeclaration();
             Accept(Do);
             ICommandNode command = ParseCommand();
-            ProgramNode program = new ProgramNode(command, declaration);
+            ProgramNode program = new ProgramNode(declaration, command);
             return program;
         }
 
@@ -293,7 +293,47 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
+        /// <summary>
+        /// Parses a parameter
+        /// </summary>
+        private IParameterNode ParseParameter()
+        {
+            Debugger.Write("Parsing Parameter");
+            switch (CurrentToken.Type)
+            {
+                case Void:
+                    return ParseVoidParameter(CurrentToken.Position);
+                case Const:
+                    return ParseConstParameter();
+                case Var:
+                    return ParseVarParameter();
+                default:
+                    return new ErrorNode(CurrentToken.Position);
+            }
+        }
 
+        private IParameterNode ParseVoidParameter(Position position)
+        {
+            Debugger.Write("Parsing Void Parameter");
+            Accept(Void); // Accept the 'void' token
+            return new VoidParameterNode(CurrentToken.Position); // Return a VoidParameterNode
+        }
+
+        private IParameterNode ParseConstParameter()
+        {
+            Debugger.Write("Parsing Const Parameter");
+            Accept(Const); // Accept the 'const' keyword
+            IExpressionNode expression = ParseExpression();  // Parse the expression
+            return new ConstParameterNode(expression);  // Return the expression as a ConstParameterNode
+        }
+
+        private IParameterNode ParseVarParameter()
+        {
+            Debugger.Write("Parsing Variable Parameter");
+            Accept(Var);  // Accept the 'var' keyword
+            IdentifierNode identifier = ParseIdentifier();  // Parse the identifier
+            return new VarParameterNode(identifier);  // Return the identifier as a VarParameterNode
+        }
 
         /// <summary>
         /// Parses a type denoter
@@ -405,52 +445,6 @@ namespace Compiler.SyntacticAnalysis
             Accept(RightBracket);
             return expression;
         }
-
-
-
-        /// <summary>
-        /// Parses a parameter
-        /// </summary>
-        private IParameterNode ParseParameter()
-        {
-            Debugger.Write("Parsing Parameter");
-            switch (CurrentToken.Type)
-            {
-                case Void:
-                    return ParseVoidParameter(CurrentToken.Position);
-                case Const:
-                    return ParseConstParameter();
-                case Var:
-                    return ParseVarParameter();
-                default:
-                    return new ErrorNode(CurrentToken.Position);
-            }
-        }
-
-        private IParameterNode ParseVoidParameter(Position position)
-        {
-            Debugger.Write("Parsing Void Parameter");
-            Accept(Void); // Accept the 'void' token
-            return new VoidParameterNode(CurrentToken.Position); // Return a VoidParameterNode
-        }
-
-        private IParameterNode ParseConstParameter()
-        {
-            Debugger.Write("Parsing Const Parameter");
-            Accept(Const); // Accept the 'const' keyword
-            IExpressionNode expression = ParseExpression();  // Parse the expression
-            return new ConstParameterNode(expression);  // Return the expression as a ConstParameterNode
-        }
-
-        private IParameterNode ParseVarParameter()
-        {
-            Debugger.Write("Parsing Variable Parameter");
-            Accept(Var);  // Accept the 'var' keyword
-            IdentifierNode identifier = ParseIdentifier();  // Parse the identifier
-            return new VarParameterNode(identifier);  // Return the identifier as a VarParameterNode
-        }
-
-
 
         /// <summary>
         /// Parses an integer literal

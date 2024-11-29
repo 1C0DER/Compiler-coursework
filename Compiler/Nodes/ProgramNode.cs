@@ -22,7 +22,7 @@
         /// </summary>
         /// <param name="command">The command that the program contains</param>
         /// <param name="declaration">The command that the program contains</param>
-        public ProgramNode(ICommandNode command, IDeclarationNode declaration)
+        public ProgramNode(IDeclarationNode declaration, ICommandNode command)
         {
             Command = command;
             Declaration = declaration;
