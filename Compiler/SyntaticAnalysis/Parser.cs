@@ -220,11 +220,11 @@ namespace Compiler.SyntacticAnalysis
             Accept(If);
             IExpressionNode expression = ParseExpression();
             Accept(Colon);
-            ICommandNode thenCommand = ParseSingleCommand();
+            ICommandNode colonCommand1 = ParseSingleCommand();
             Accept(Colon);
-            ICommandNode elseCommand = ParseSingleCommand();
+            ICommandNode colonCommand2 = ParseSingleCommand();
             Accept(EndIf);
-            return new IfCommandNode(expression, thenCommand, elseCommand, startPosition);
+            return new IfCommandNode(expression, colonCommand1, colonCommand1, startPosition);
         }
 
         /// <summary>
