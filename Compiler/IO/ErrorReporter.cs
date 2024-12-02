@@ -11,5 +11,10 @@ namespace Compiler.IO
         /// Whether or not any errors have been encountered
         /// </summary>
         public bool HasErrors { get; }
+
+        internal void ReporterError()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

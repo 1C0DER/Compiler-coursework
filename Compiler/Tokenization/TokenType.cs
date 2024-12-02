@@ -17,7 +17,7 @@ namespace Compiler.Tokenization
         // reserved words - terminals
         Begin, Const, Do, Else, End, If, In, Let, Then, Var, While,
 
-        // punctuation - terminals (Becomes is for assignment (:=) , Is is for constants (~))
+        // punctuation - terminals (Becomes is for assignment (<=) , Is is for constants (~))
         Colon, Semicolon, Becomes, Is, LeftBracket, RightBracket, LeftSquareBracket, RightSquareBracket,
 
         // special tokens

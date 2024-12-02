@@ -32,7 +32,12 @@ namespace Compiler
         /// <summary>
         /// The parser
         /// </summary>
-        public Parser Parser { get; }        public DeclarationIdentifier Identifier { get; }        public TypeChecker Checker { get; }
+        public Parser Parser { get; }
+
+        public DeclarationIdentifier Identifier { get; }
+
+        public TypeChecker Checker { get; }
+
         /// <summary>
         /// Creates a new compiler
         /// </summary>
