@@ -9,7 +9,7 @@
         /// <summary>
         /// The then branch command
         /// </summary>
-        public ICommandNode DoCommand { get; }
+        public ICommandNode Command { get; }
 
 
         /// <summary>
@@ -20,11 +20,11 @@
         /// <summary>
         /// Creates a new if command node
         /// </summary>
-        /// <param name="doCommand">The else branch command</param>
+        /// <param name="command">The else branch command</param>
         /// <param name="position">The position in the code where the content associated with the node begins</param>
-        public DoCommandNode(ICommandNode doCommand, Position position)
+        public DoCommandNode(ICommandNode command, Position position)
         {
-            DoCommand = doCommand;
+            Command = command;
             Position = position;
         }
     }
