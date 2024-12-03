@@ -1,2 +1,4 @@
-!this is an example program
-declare global dec x as var: Integer <- 10; dec y as const <- 5 do x <- x + y;
+declare global dec x as var: Integer <- 10; 
+dec y as const <- 5 do x <- x + y; 
+! This is a comment
+$identifier$ <- 'c';
