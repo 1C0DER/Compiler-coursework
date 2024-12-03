@@ -12,7 +12,7 @@ namespace Compiler.IO
         /// </summary>
         public bool HasErrors { get; }
 
-        internal void ReporterError()
+        internal void ReporterError(string v)
         {
             throw new NotImplementedException();
         }

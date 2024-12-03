@@ -7,6 +7,8 @@ namespace Compiler.Nodes
     /// </summary>
     public class IdentifierNode : IDeclaredNode
     {
+        internal object name;
+
         /// <summary>
         /// The identifier token
         /// </summary>

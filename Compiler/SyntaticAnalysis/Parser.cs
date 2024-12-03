@@ -489,7 +489,13 @@ namespace Compiler.SyntacticAnalysis
         private OperatorNode ParseOperator()
         {
             Debugger.Write("Parsing operator");
+            if(CurrentToken.Type != Operator)
+            {
+                Reporter.ReporterError($"Expected operator, but found '{CurrentToken.Type}' at position {CurrentToken.Position}.");
+                return null;
+            }
             Token OperatorToken = CurrentToken;
+            MoveNext();
             Accept(Operator);
             return new OperatorNode(OperatorToken);
         }
