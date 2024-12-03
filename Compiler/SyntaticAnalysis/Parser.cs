@@ -135,7 +135,9 @@ namespace Compiler.SyntacticAnalysis
                 case While:
                     return ParseWhileCommand();
                 default:
-                    return ParseSkipCommand();
+                    // Handling unexpected token types that do not start a command
+                    Reporter.ReporterError($"Unexpected token '{CurrentToken.Type}' at position {CurrentToken.Position}. Expected a command starter.");
+                    return new ErrorNode(CurrentToken.Position); 
             }
         }
 
@@ -200,12 +202,52 @@ namespace Compiler.SyntacticAnalysis
         {
             Debugger.Write("Parsing While Command");
             Position startPosition = CurrentToken.Position;
+
+            if (CurrentToken.Type != While)
+            {
+                Reporter.ReporterError($"Expected 'while' at position {startPosition}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(startPosition);  
+            }
+
             Accept(While);
             IExpressionNode expression = ParseExpression();
+
+            if (expression == null)
+            {
+                return new ErrorNode(CurrentToken.Position); 
+            }
+
+            if (CurrentToken.Type != Do)
+            {
+                Reporter.ReporterError($"Expected 'do' after 'while' condition at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);
+            }
             Accept(Do);
+
             ICommandNode loopBody = ParseSingleCommand();
+            if (loopBody is ErrorNode)
+            {
+                return loopBody; 
+            }
+
+            if (CurrentToken.Type != After)
+            {
+                Reporter.ReporterError($"Expected 'after' at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  
+            }
             Accept(After);
+
             ICommandNode afterCommand = ParseSingleCommand();
+            if (afterCommand is ErrorNode)
+            {
+                return afterCommand;
+            }
+
+            if (CurrentToken.Type != Wend)
+            {
+                Reporter.ReporterError($"Expected 'wend' to close 'while' loop at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  
+            }
             Accept(Wend);
             return new WhileCommandNode(expression, afterCommand, loopBody, startPosition);
         }
@@ -217,13 +259,52 @@ namespace Compiler.SyntacticAnalysis
         {
             Debugger.Write("Parsing If Command");
             Position startPosition = CurrentToken.Position;
+
+            if (CurrentToken.Type != If)
+            {
+                Reporter.ReporterError($"Expected 'if' at position {startPosition}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(startPosition);  
+            }
             Accept(If);
             IExpressionNode expression = ParseExpression();
+            if (expression == null)
+            {
+                return new ErrorNode(CurrentToken.Position);
+            }
+
+            if (CurrentToken.Type != Colon)
+            {
+                Reporter.ReporterError($"Expected ':' after 'if' condition at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  
+            }
             Accept(Colon);
+
             ICommandNode colonCommand1 = ParseSingleCommand();
+            if (colonCommand1 is ErrorNode)
+            {
+                return colonCommand1; 
+            }
+
+            if (CurrentToken.Type != Colon)
+            {
+                Reporter.ReporterError($"Expected second ':' in 'if' command at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  // Error handling for missing second ':'
+            }
             Accept(Colon);
+
             ICommandNode colonCommand2 = ParseSingleCommand();
+            if (colonCommand2 is ErrorNode)
+            {
+                return colonCommand2; 
+            }
+
+            if (CurrentToken.Type != EndIf)
+            {
+                Reporter.ReporterError($"Expected 'endif' to close 'if' command at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  
+            }
             Accept(EndIf);
+
             return new IfCommandNode(expression, colonCommand1, colonCommand1, startPosition);
         }
 
@@ -234,10 +315,33 @@ namespace Compiler.SyntacticAnalysis
         {
             Debugger.Write("Parsing Let Command");
             Position startPosition = CurrentToken.Position;
+
+            if (CurrentToken.Type != Let)
+            {
+                Reporter.ReporterError($"Expected 'let' at position {startPosition}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(startPosition); 
+            }
             Accept(Let);
             IDeclarationNode declaration = ParseDeclaration();
+
+            if (CurrentToken.Type != In)
+            {
+                Reporter.ReporterError($"Expected 'in' after 'let' declaration at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  
+            }
             Accept(In);
+
             ICommandNode command = ParseSingleCommand();
+            if (command is ErrorNode)
+            {
+                return command; 
+            }
+
+            if (CurrentToken.Type != EndLet)
+            {
+                Reporter.ReporterError($"Expected 'endlet' to close 'let' command at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  
+            }
             Accept(EndLet);
             return new LetCommandNode(declaration, command, startPosition);
         }
@@ -315,6 +419,12 @@ namespace Compiler.SyntacticAnalysis
         private IParameterNode ParseVoidParameter(Position position)
         {
             Debugger.Write("Parsing Void Parameter");
+            if (CurrentToken.Type != Void)
+            {
+                Reporter.ReporterError($"Expected 'void' at position {position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  // Error handling for missing 'void'
+            }
+
             Accept(Void); // Accept the 'void' token
             return new VoidParameterNode(CurrentToken.Position); // Return a VoidParameterNode
         }
@@ -322,6 +432,12 @@ namespace Compiler.SyntacticAnalysis
         private IParameterNode ParseConstParameter()
         {
             Debugger.Write("Parsing Const Parameter");
+            if (CurrentToken.Type != Const)
+            {
+                Reporter.ReporterError($"Expected 'const' at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  // Error handling for missing 'const'
+            }
+
             Accept(Const); // Accept the 'const' keyword
             IExpressionNode expression = ParseExpression();  // Parse the expression
             return new ConstParameterNode(expression);  // Return the expression as a ConstParameterNode
@@ -330,6 +446,12 @@ namespace Compiler.SyntacticAnalysis
         private IParameterNode ParseVarParameter()
         {
             Debugger.Write("Parsing Variable Parameter");
+            if (CurrentToken.Type != Var)
+            {
+                Reporter.ReporterError($"Expected 'var' at position {CurrentToken.Position}, but found '{CurrentToken.Type}'.");
+                return new ErrorNode(CurrentToken.Position);  // Error handling for missing 'var'
+            }
+
             Accept(Var);  // Accept the 'var' keyword
             IdentifierNode identifier = ParseIdentifier();  // Parse the identifier
             return new VarParameterNode(identifier);  // Return the identifier as a VarParameterNode
@@ -354,6 +476,12 @@ namespace Compiler.SyntacticAnalysis
         {
             Debugger.Write("Parsing Expression");
             IExpressionNode leftExpression = ParsePrimaryExpression();
+            if (leftExpression == null || leftExpression is ErrorNode)
+            {
+                Reporter.ReporterError("Invalid expression at the start of an expression parsing.");
+                return new ErrorNode(CurrentToken.Position);
+            }
+
             while (CurrentToken.Type == Operator)
             {
                 OperatorNode operation = ParseOperator();
@@ -453,7 +581,13 @@ namespace Compiler.SyntacticAnalysis
         private IntegerLiteralNode ParseIntegerLiteral()
         {
             Debugger.Write("Parsing integer literal");
+            if (CurrentToken.Type != IntLiteral)
+            {
+                Reporter.ReporterError($"Expected an integer literal, but found '{CurrentToken.Type}' at position {CurrentToken.Position}.");
+                return null;
+            }
             Token integerLiteralToken = CurrentToken;
+            MoveNext();
             Accept(IntLiteral);
             return new IntegerLiteralNode(integerLiteralToken);
         }
@@ -465,7 +599,13 @@ namespace Compiler.SyntacticAnalysis
         private CharacterLiteralNode ParseCharacterLiteral()
         {
             Debugger.Write("Parsing character literal");
+            if (CurrentToken.Type != CharLiteral)
+            {
+                Reporter.ReporterError($"Expected an chracter literal, but found '{CurrentToken.Type}' at position {CurrentToken.Position}.");
+                return null;
+            }
             Token CharacterLiteralToken = CurrentToken;
+            MoveNext();
             Accept(CharLiteral);
             return new CharacterLiteralNode(CharacterLiteralToken);
         }
@@ -477,6 +617,11 @@ namespace Compiler.SyntacticAnalysis
         private IdentifierNode ParseIdentifier()
         {
             Debugger.Write("Parsing identifier");
+            if (CurrentToken.Type != Identifier)
+            {
+                Reporter.ReporterError($"Expected identifier, but found '{CurrentToken.Type}' at position {CurrentToken.Position}.");
+                return null;
+            }
             Token IdentifierToken = CurrentToken;
             Accept(Identifier);
             return new IdentifierNode(IdentifierToken);
