@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace Compiler.Tokenization
@@ -35,10 +36,6 @@ namespace Compiler.Tokenization
         {
             Reader = reader;
             Reporter = reporter;
-        }
-
-        public Tokenizer(StringReader stringReader, ErrorReporter errorReporter)
-        {
         }
 
         /// <summary>
